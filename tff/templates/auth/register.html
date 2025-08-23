@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-6">
+    <div class="card">
+      <div class="card-body p-4">
+        <div class="page-title mb-3">Create Account</div>
+        <form method="post" action="">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name</label>
+              <input type="text" name="full_name" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Department</label>
+              <select name="department" class="form-select" required>
+                <option value="">Choose...</option>
+                <option>Administration</option>
+                <option>Procurement</option>
+                <option>Finance</option>
+                <option>HR</option>
+                <option>ICT</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone</label>
+              <input type="text" name="phone" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Username</label>
+              <input type="text" name="username" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Password</label>
+              <input type="password" name="password" class="form-control" required>
+            </div>
+          </div>
+          <div class="d-grid mt-3">
+            <button class="btn btn-dark">Register</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <p class="text-center mt-3">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <div class="page-title mb-3">Material Requisition</div>
+        <form method="post" action="">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Item Name</label>
+              <input name="item_name" class="form-control" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Quantity</label>
+              <input name="quantity" type="number" min="1" class="form-control" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Unit</label>
+              <input name="unit" class="form-control" placeholder="L, pcs, box">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Department</label>
+              <select name="department" class="form-select" required>
+                <option>Procurement</option><option>Finance</option><option>ICT</option><option>Administration</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Purpose/Justification</label>
+              <textarea name="purpose" class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="d-grid mt-3">
+            <button class="btn btn-dark">Submit Request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

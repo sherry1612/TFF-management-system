@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-title mb-3">Approvals (Manager/Accountant)</div>
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <thead><tr><th>#</th><th>Type</th><th>Requester</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          {% for r in approvals %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ r.type }}</td>
+            <td>{{ r.requester }}</td>
+            <td><span class="badge bg-warning text-dark">{{ r.status }}</span></td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <a href="#" class="btn btn-outline-success">Approve</a>
+                <a href="#" class="btn btn-outline-danger">Reject</a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center text-muted">No pending requests.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

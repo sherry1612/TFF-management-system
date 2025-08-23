@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-title mb-3">Finance (Payments)</div>
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <thead><tr><th>#</th><th>Type</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          {% for r in finance_items %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ r.type }}</td>
+            <td>{{ r.amount }}</td>
+            <td><span class="badge bg-info text-dark">{{ r.status }}</span></td>
+            <td><a href="#" class="btn btn-sm btn-outline-dark">Mark as Paid</a></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center text-muted">No items in finance queue.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
