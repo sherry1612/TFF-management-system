@@ -19,11 +19,38 @@ def login_view(request):
         messages.error(request, "Invalid credentials")
     return render(request, "auth/login.html")
 
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model
+from django.contrib import messages
+
+User = get_user_model()
+
 def register_view(request):
-    # NOTE: This is a simple placeholder; integrate with your CustomUser later.
     if request.method == "POST":
-        messages.success(request, "Registration submitted (demo). You can now login.")
+        full_name = request.POST.get("full_name")
+        department = request.POST.get("department")
+        email = request.POST.get("email")
+        phone = request.POST.get("phone")
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists")
+            return redirect("register")
+
+        user = User(
+            full_name=full_name,
+            department=department,
+            email=email,
+            phone=phone,
+            username=username,
+        )
+        user.set_password(password)  # hash password
+        user.save()
+
+        messages.success(request, "Account created! You can log in now.")
         return redirect("login")
+
     return render(request, "auth/register.html")
 
 
