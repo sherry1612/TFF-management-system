@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib.auth.models import User
+from .models import *
+from .forms import *
 
 
 # ---- Auth ----
@@ -81,7 +83,6 @@ def register_view(request):
 #         phone = request.POST.get("phone")
 #         username = request.POST.get("username")
 #         password = request.POST.get("password")
-
 #         if User.objects.filter(username=username).exists():
 #             messages.error(request, "Username already exists")
 #             return redirect("register")
@@ -93,7 +94,7 @@ def register_view(request):
 
 #         messages.success(request, "Registration successful! Please login.")
 #         return redirect("login")
-
+ 
 #     return render(request, "register.html")
 
 def logout_view(request):
@@ -103,7 +104,7 @@ def logout_view(request):
 # ---- Core Pages ----
 @login_required(login_url="login")
 def dashboard(request):
-    # demo data
+    
     stats = {"all": 8, "pending": 3, "approved": 4, "completed": 1}
     requests_list = [
         {"type": "Material", "department": "Procurement", "status": "Pending", "submitted": timezone.now().date()},
@@ -157,9 +158,27 @@ def finance(request):
     return render(request, "finance.html", {"finance_items": finance_items})
 
 @login_required(login_url="login")
-def profile(request):
-    if request.method == "POST":
-        messages.success(request, "Profile updated (demo).")
-        return redirect("profile")
-    return render(request, "profile.html")
 
+
+def profile(request):
+    try:
+        if request.method == "POST":
+            form = ProfileForm(request.POST, instance=request.user)
+
+            if form.is_valid():
+                form.save()
+                messages.success(request, "✅ Profile updated successfully.")
+                return redirect("profile")
+            else:
+                # Debug: print form errors in terminal
+                print("❌ Form errors:", form.errors)
+                messages.error(request, "There were errors in the form.")
+        else:
+            form = ProfileForm(instance=request.user)
+
+    except Exception as e:
+        print("⚠️ Error in profile view:", str(e))  # Debugging
+        messages.error(request, f"Something went wrong: {e}")
+        form = ProfileForm(instance=request.user)
+
+    return render(request, "profile.html", {"form": form})
