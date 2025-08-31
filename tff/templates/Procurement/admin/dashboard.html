@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TFF Management System</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom Styles -->
+  <style>
+    body { background: #f8fafc; }
+    .navbar-brand { font-weight: 700; letter-spacing: .3px; }
+    .page-title { font-size: 1.25rem; font-weight: 600; }
+    .card { border: 0; border-radius: 1rem; box-shadow: 0 4px 20px rgba(0, 0, 0, .05); }
+    footer { font-size: .9rem; color: #6c757d; }
+    .sidebar {
+      padding: 1rem;
+      background: #fff;
+      border-right: 1px solid #e5e7eb;
+      min-height: 100vh;
+    }
+    .sidebar a {
+      display: block;
+      padding: .5rem 0;
+      text-decoration: none;
+      color: #000;
+    }
+    .dropdown-wrapper { margin-top: 1rem; }
+    .dropdown-btn { cursor: pointer; font-weight: 600; }
+    .dropdown-container { display: none; padding-left: 1rem; }
+    .arrow { font-size: .8rem; }
+  </style>
+
+  {% load static %}
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="">TFF Request MS</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div id="nav" class="collapse navbar-collapse">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link" href="">Dashboard</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Submit Request</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'request_material'%}">Material Requisition</a></li>
+              <li><a class="dropdown-item" href="{% url 'request_holiday'%}">Holiday Leave</a></li>
+              <li><a class="dropdown-item" href="{%url 'request_appointment'%}">Appointment</a></li>
+            </ul>
+          </li>
+          <li class="nav-item"><a class="nav-link" href="{%url 'my_requests'%}">My Requests</a></li>
+          <li class="nav-item"><a class="nav-link" href="{%url 'approvals'%}">Approvals</a></li>
+          <li class="nav-item"><a class="nav-link" href="{%url 'finance'%}">Finance</a></li>
+        </ul>
+
+        <ul class="navbar-nav">
+          {% if request.user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{%url 'profile'%}">Profile</a></li>
+            <li class="nav-item"><a class="nav-link" href="">Logout</a></li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="">Register</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h5 class="fw-bold">TFF Management</h5>
+    <small class="text-muted">TFF Management System</small>
+
+    <a href="">📊 Dashboard</a>
+
+    <!-- Dropdown for Users -->
+    <div class="dropdown-wrapper">
+      <div class="dropdown-btn" onclick="toggleDropdown('userDropdown')">
+        👥 Manage Users <span class="arrow">▼</span>
+      </div>
+      <div class="dropdown-container" id="userDropdown">
+        <a href="">Administration</a>
+        <a href="">Procurement</a>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <a href="">Administration</a>
+    <a href="">Procurement</a>
+    <a href="">Finance</a>
+    <a href="">HR</a>
+    <a href="">ICT</a>
+    <a href="{% url 'Procurementregister' %}">Register</a>
+  </div>
+
+  <!-- Navbar -->
+  
+  <!-- Main Content -->
+  <main class="container py-4">
+    {% if messages %}
+      <div class="mb-3">
+        {% for m in messages %}
+          <div class="alert alert-{{ m.tags|default:'info' }} mb-2">{{ m }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-top py-4">
+    <div class="container d-flex justify-content-between">
+      <span>© {% now "Y" %} TFF Request MS</span>
+      <span>Transparency • Accountability • Speed</span>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
+
+  <script>
+    // Toggle dropdowns in sidebar
+    function toggleDropdown(id) {
+      var dropdown = document.getElementById(id);
+      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    }
+  </script>
+</body>
+</html>

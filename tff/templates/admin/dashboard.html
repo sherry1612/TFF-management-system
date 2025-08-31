@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <title>TFF Management</title>
+ <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      background-color: #fceef0;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #f8d7da;
+      color: #4a3c3c;
+      padding: 20px;
+      height: 100vh;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    }
+
+    .sidebar h2 {
+      margin-top: 0;
+      font-size: 24px;
+    }
+
+    .sidebar small {
+      display: block;
+      margin-bottom: 20px;
+      color: #5a4b4b;
+    }
+
+    .sidebar a,
+    .dropdown-btn {
+      display: block;
+      padding: 10px 15px;
+      color: #4a3c3c;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-bottom: 5px;
+      transition: background-color 0.3s;
+      background-color: #fbeaec;
+    }
+
+    .sidebar a:hover,
+    .dropdown-btn:hover {
+      background-color: #f4c2c7;
+    }
+
+    .dropdown-container {
+      display: none;
+      padding-left: 15px;
+    }
+
+    .arrow {
+      float: right;
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px;
+      background-color: #fff0f3;
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .card h3 {
+      color: #b35b6b;
+    }
+
+    .card ul li {
+      margin-bottom: 8px;
+    }
+
+    h1, h2 {
+      color: #a74356;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+<title>TFF Management</title>
+    <small>TFF Management System</small>
+
+    <!-- Manage Users -->
+    <div class="dropdown-wrapper">
+      <a href="">📊 Dashboard</a>
+      <div class="dropdown-btn" onclick="toggleDropdown('userDropdown')">
+        👥 Manage Users <span class="arrow">▼</span>
+      </div>
+      <div class="dropdown-container" id="userDropdown">
+        <a href="">Administration</a>
+        <a href="">Procurement</a>
+      </div>
+    </div>
+
+    <a href=""> Administration</a>
+    <a href=""> Procurement</a>
+    <a href=""> Finance</a>
+    <a href=""> HR</a>
+    <a href=""> ICT</a>
+    <a href="{% url 'register' %}"> Register</a>
+  </div>
+
+  <div class="main">
+    <h1>Welcome, Admin 👋</h1>
+    <h2>Admin Dashboard</h2>
+
+    <div class="card">
+      <h3>System Overview</h3>
+      <p>This dashboard allows administrators to manage donors and recipients, view donations, and monitor system activities.</p>
+    </div>
+
+    <div class="card">
+      <h3>Quick Stats</h3>
+      <ul>
+       
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const activeDropdowns = {};
+
+    function toggleDropdown(id) {
+      const dropdown = document.getElementById(id);
+      const isOpen = dropdown.style.display === 'block';
+      dropdown.style.display = isOpen ? 'none' : 'block';
+      activeDropdowns[id] = !isOpen;
+    }
+  </script>
+
+</body>
+</html>

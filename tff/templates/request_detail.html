@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-title mb-3">Request Details</div>
+<div class="card">
+  <div class="card-body">
+    <p><strong>Type:</strong> {{ req.type }}</p>
+    <p><strong>Status:</strong> {{ req.status }}</p>
+    <p><strong>Submitted:</strong> {{ req.submitted }}</p>
+    <p><strong>Description:</strong> {{ req.description }}</p>
+  </div>
+</div>
+
+<a href="{% url 'my_requests' %}" class="btn btn-secondary mt-3">Back</a>
+{% endblock %}
