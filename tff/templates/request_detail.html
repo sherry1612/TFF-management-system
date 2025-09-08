@@ -5,10 +5,9 @@
   <div class="card-body">
     <p><strong>Type:</strong> {{ req.type }}</p>
     <p><strong>Status:</strong> {{ req.status }}</p>
-    <p><strong>Submitted:</strong> {{ req.created_at|date:"Y-m-d H:i" }}</p> <!-- ✅ changed -->
+    <p><strong>Submitted:</strong> {{req.submitted }}</p> <!-- ✅ changed -->
     <p><strong>Description:</strong> {{ req.description }}</p>
   </div>
 </div>
 
-<a href="{% url 'my_requests' %}" class="btn btn-secondary mt-3">Back</a>
 {% endblock %}

@@ -13,7 +13,6 @@
             <a href="{% url 'request_appointment' user.pk %}" class="btn btn-warning w-100 mb-3">Request Appointment</a>
         </div>
     </div>
-
     <h3 class="mt-4">My Material Requests</h3>
     <table class="table table-bordered mt-2">
         <thead>
@@ -35,7 +34,7 @@
                 <td>{{ req.purpose }}</td>
                 <td>{{ req.status }}</td>
                 <td>
-                    <a href="{% url 'request_material' req.pk %}" class="btn btn-sm btn-info">View</a>
+                    <a href="{% url 'request_detail' req.pk %}" class="btn btn-sm btn-info">View</a>
                     <a href="{% url 'update_material_req' req.pk %}" class="btn btn-sm btn-secondary">Edit</a>
                 </td>
             </tr>
@@ -68,7 +67,7 @@
                 <td>{{ hol.reason }}</td>
                 <td>{{ hol.status }}</td>
                 <td>
-                    <a href="{% url 'request_holiday' hol.pk %}" class="btn btn-sm btn-info">View</a>
+                    <a href="{% url 'request_detail' hol.pk %}" class="btn btn-sm btn-info">View</a>
                     <a href="{% url 'update_holiday_req' hol.pk %}" class="btn btn-sm btn-secondary">Edit</a>
                 </td>
             </tr>

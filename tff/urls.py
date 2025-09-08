@@ -47,4 +47,10 @@ urlpatterns = [
     path('approve/<int:pk>/', views.approve_request, name='approve_request'),
     path('reject/<int:pk>/', views.reject_request, name='reject_request'),
     path('forward/<int:pk>/', views.forward_request, name='forward_request'),
+path('approve_holiday/<int:pk>/', views.approve_holiday, name='approve_holiday'),
+path('reject_holiday/<int:pk>/', views.reject_holiday, name='reject_holiday'),
+path('forward_holiday/<int:pk>/', views.forward_holiday, name='forward_holiday'),
+path('approve_appointment/<int:pk>/', views.approve_appointment, name='approve_appointment'),
+path('reject_appointment/<int:pk>/', views.reject_appointment, name='reject_appointment'),
+path('forward_appointment/<int:pk>/', views.forward_appointment, name='forward_appointment'),
 ]

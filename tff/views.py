@@ -291,10 +291,18 @@ def all_requests(request):
 def ICT_dashboard(request,pk):
     user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
     material = MaterialRequisition.objects.filter(status="pending")
-
+    holiday = HolidayLeaveRequest.objects.filter(status="pending")
+    appointment = AppointmentRequest.objects.filter(status="pending")
     pending_requests = MaterialRequisition.objects.filter(status="pending")
+    pending_requests_holiday = HolidayLeaveRequest.objects.filter(status="pending")
+    pending_requests_appointment = AppointmentRequest.objects.filter(status="pending")
+
 
     print("DEBUG: Material count =", material.count())
+    print("DEBUG: Pending ICT Requests =", pending_requests.count())
+    print("DEBUG: holiday count =", holiday.count())
+    print("DEBUG: Pending ICT Requests =", pending_requests.count())
+    print("DEBUG: appointment count =", appointment.count())
     print("DEBUG: Pending ICT Requests =", pending_requests.count())
 
     return render(
@@ -303,6 +311,10 @@ def ICT_dashboard(request,pk):
         {
             'user': user,
             "material": material,
+            "holiday":holiday,
+            "appointment":appointment,
+            "pending_requests_appointment ":pending_requests_appointment,
+            "pending_requests_holiday ":pending_requests_holiday, 
             "pending_requests": pending_requests
         }
     )
@@ -423,6 +435,74 @@ def forward_request(request, pk):
             req.save()
 
         return redirect('ICT_dashboard', pk=pk)
+    # ===========================
+#   HOLIDAY REQUEST ACTIONS
+# ===========================
+@login_required
+def approve_holiday(request, pk):
+    if request.method == 'POST':
+        req = get_object_or_404(HolidayLeaveRequest, pk=pk)
+        req.status = 'Approved'
+        req.save()
+    return redirect('ICT_dashboard', pk=pk)
+
+
+@login_required
+def reject_holiday(request, pk):
+    if request.method == 'POST':
+        req = get_object_or_404(HolidayLeaveRequest, pk=pk)
+        req.status = 'Rejected'
+        req.save()
+    return redirect('ICT_dashboard', pk=pk)
+
+
+@login_required
+def forward_holiday(request, pk):
+    if request.method == 'POST':
+        req = get_object_or_404(HolidayLeaveRequest, pk=pk)
+        next_department = request.POST.get('status')
+
+        if next_department:
+            req.next_department = next_department
+            req.status = "Forwarded"
+            req.save()
+
+    return redirect('ICT_dashboard', pk=pk)
+
+
+# ===============================
+#   APPOINTMENT REQUEST ACTIONS
+# ===============================
+@login_required
+def approve_appointment(request, pk):
+    if request.method == 'POST':
+        req = get_object_or_404(AppointmentRequest, pk=pk)
+        req.status = 'Approved'
+        req.save()
+    return redirect('ICT_dashboard', pk=pk)
+
+
+@login_required
+def reject_appointment(request, pk):
+    if request.method == 'POST':
+        req = get_object_or_404(AppointmentRequest, pk=pk)
+        req.status = 'Rejected'
+        req.save()
+    return redirect('ICT_dashboard', pk=pk)
+
+
+@login_required
+def forward_appointment(request, pk):
+    if request.method == 'POST':
+        req = get_object_or_404(AppointmentRequest, pk=pk)
+        next_department = request.POST.get('status')
+
+        if next_department:
+            req.next_department = next_department
+            req.status = "Forwarded"
+            req.save()
+
+    return redirect('ICT_dashboard', pk=pk)
 
 @login_required
 def ict_member_dashboard(request):
