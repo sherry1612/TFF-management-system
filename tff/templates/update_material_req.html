@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <div class="page-title mb-3">Update Material Requisition</div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Item Name</label>
+              {{ form.item_name }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Quantity</label>
+              {{ form.quantity }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Unit</label>
+              {{ form.unit }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Department</label>
+              {{ form.department }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Purpose/Justification</label>
+              {{ form.purpose }}
+            </div>
+          </div>
+          <div class="d-grid mt-3">
+            <button class="btn btn-dark">Update Request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

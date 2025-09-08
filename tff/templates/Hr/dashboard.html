@@ -49,9 +49,9 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Submit Request</a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{% url 'request_material'%}">Material Requisition</a></li>
-              <li><a class="dropdown-item" href="{% url 'request_holiday'%}">Holiday Leave</a></li>
-              <li><a class="dropdown-item" href="{%url 'request_appointment'%}">Appointment</a></li>
+              <li><a class="dropdown-item" href="{% url 'request_material' user.pk%}">Material Requisition</a></li>
+              <li><a class="dropdown-item" href="{% url 'request_holiday' user.pk%}">Holiday Leave</a></li>
+              <li><a class="dropdown-item" href="{%url 'request_appointment' user.pk%}">Appointment</a></li>
             </ul>
           </li>
           <li class="nav-item"><a class="nav-link" href="{%url 'my_requests'%}">My Requests</a></li>

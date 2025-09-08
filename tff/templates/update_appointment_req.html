@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <div class="page-title mb-3">Appointment Request</div>
+        <form method="post" action="">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Date</label>
+                {{ form.date }}
+
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Time</label>
+                {{ form.time }}
+
+            </div>
+            <div class="col-12">
+              <label class="form-label">With (Department/Person)</label>
+                            {{ form.with_whom }}
+
+            </div>
+            <div class="col-12">
+              <label class="form-label">Purpose</label>
+                            {{ form.purpose }}
+
+            </div>
+          </div>
+          <div class="d-grid mt-3">
+            <button class="btn btn-dark">Request update Appointment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

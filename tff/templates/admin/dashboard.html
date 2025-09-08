@@ -2,17 +2,19 @@
 <html lang="en">
   <title>TFF Management</title>
  <style>
-    body {
+
+    /* General */
+   body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
-      background-color: #fceef0;
+      background-color: #f5f5f5; /* Light neutral background */;
     }
 
     .sidebar {
       width: 250px;
-      background-color: #f8d7da;
-      color: #4a3c3c;
+      background-color: linear-gradient(180deg, #0047AB 0%, #4CAF50 100%); /* Blue → Green gradient */ ;
+      color: linear-gradient(180deg, #0047AB 0%, #4CAF50 100%); /* Blue → Green */; 
       padding: 20px;
       height: 100vh;
       box-shadow: 2px 0 5px rgba(0,0,0,0.05);
@@ -26,24 +28,24 @@
     .sidebar small {
       display: block;
       margin-bottom: 20px;
-      color: #5a4b4b;
+      color: #000000; 
     }
 
     .sidebar a,
     .dropdown-btn {
       display: block;
       padding: 10px 15px;
-      color: #4a3c3c;
+      color: #000000; /* Black links */ ;
       text-decoration: none;
       border-radius: 5px;
       margin-bottom: 5px;
       transition: background-color 0.3s;
-      background-color: #fbeaec;
+      background-color: #FFD700; /* Yellow buttons */;
     }
 
     .sidebar a:hover,
     .dropdown-btn:hover {
-      background-color: #f4c2c7;
+      background-color: #FFEA70; /* Light yellow hover */;
     }
 
     .dropdown-container {
@@ -58,11 +60,13 @@
     .main {
       flex: 1;
       padding: 30px;
-      background-color: #fff0f3;
+      background-color:#ffffff; /* White main content */
+ ;
     }
 
     .card {
       background: #ffffff;
+;
       padding: 20px;
       border-radius: 10px;
       margin-bottom: 20px;
@@ -70,15 +74,16 @@
     }
 
     .card h3 {
-      color: #b35b6b;
+      color:  #0047AB; /* Blue headings */;
     }
 
     .card ul li {
       margin-bottom: 8px;
+      color: #000000; /* Black text */
     }
 
     h1, h2 {
-      color: #a74356;
+      color: #4CAF50; /* Green main headings */
     }
   </style>
 </head>
@@ -95,17 +100,18 @@
         👥 Manage Users <span class="arrow">▼</span>
       </div>
       <div class="dropdown-container" id="userDropdown">
-        <a href="">Administration</a>
-        <a href="">Procurement</a>
+         
+        
       </div>
     </div>
-
-    <a href=""> Administration</a>
-    <a href=""> Procurement</a>
-    <a href=""> Finance</a>
-    <a href=""> HR</a>
-    <a href=""> ICT</a>
+        <a href="{% url 'administration_dashboard' user.pk %}"> Administration</a>
+    <a href="{% url 'procurement_dashboard' user.pk %}"> Procurement</a>
+    <a href="{% url 'finance' %}"> Finance</a>
+    <a href="{% url 'manage_users' %}" class="btn btn-primary">Manage Users</a>
+    <a href="{% url 'hr_dashboard' user.pk %}"> HR</a>
+    <a href="{% url 'ICT_dashboard' user.pk %}"> ICT</a>
     <a href="{% url 'register' %}"> Register</a>
+
   </div>
 
   <div class="main">
@@ -114,7 +120,7 @@
 
     <div class="card">
       <h3>System Overview</h3>
-      <p>This dashboard allows administrators to manage donors and recipients, view donations, and monitor system activities.</p>
+      <p>This dashboard allows a.</p>
     </div>
 
     <div class="card">
@@ -135,6 +141,5 @@
       activeDropdowns[id] = !isOpen;
     }
   </script>
-
 </body>
 </html>

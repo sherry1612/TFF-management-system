@@ -5,7 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib.auth.models import User
 from .models import Request  
-from .forms import RequestForm  
+
+from .forms import RequestForm
 from .models import *
 from .forms import *
 from django.contrib import messages
@@ -25,8 +26,7 @@ def login_view(request):
             messages.success(request, f"Welcome back, {user.username}!")
             request.session['CustomUser_id'] = user.id
             # ✅ redirect based on department field
-            department = getattr(user, "department", None)  # safe way to fetch
-            
+            department = getattr(user, "department", None)  # safe way to fetch data
             if department == "AdministrationAdmin":
               return redirect("administration_dashboard",pk=user.pk)
             elif department == "Administration":
@@ -254,23 +254,184 @@ def logout_view(request):
 @login_required(login_url="login")
 def dashboard(request,pk):
     user = get_object_or_404(CustomUser, pk=pk) 
+    # Overview stats for Super Admin
+    total_users = CustomUser.objects.count()
+    total_requests = Request.objects.count()
+    material_count = MaterialRequisition.objects.count()
+    holiday_count = HolidayLeaveRequest.objects.count()
+    appointment_count = AppointmentRequest.objects.count()
+
+    return render(request, "admin/dashboard.html", {
+        "user": user,
+        "total_users": total_users,
+        "total_requests": total_requests,
+        "material_count": material_count,
+        "holiday_count": holiday_count,
+        "appointment_count": appointment_count,
+    })
+
     
-    return render(request, "admin/dashboard.html",{'user':user})
+    #  MANAGE USERS 
+@login_required(login_url="login")
+def manage_users(request):
+    users = CustomUser.objects.all()
+    return render(request, "admin/manage_users.html", {"users": users})
+
+
+#  VIEW ALL REQUESTS 
+@login_required(login_url="login")
+def all_requests(request):
+    requests_list = Request.objects.all().order_by("-created_at")
+    return render(request, "admin/all_requests.html", {"requests": requests_list})
+
+
 
 
 @login_required(login_url="login")
 def ICT_dashboard(request,pk):
     user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
+    material = MaterialRequisition.objects.filter(status="pending")
+
+    pending_requests = MaterialRequisition.objects.filter(status="pending")
+
+    print("DEBUG: Material count =", material.count())
+    print("DEBUG: Pending ICT Requests =", pending_requests.count())
+
+    return render(
+        request,
+        "ICT/admin/dashboard.html",
+        {
+            'user': user,
+            "material": material,
+            "pending_requests": pending_requests
+        }
+    )
+@login_required
+
+
+def ict_request_material(request):
+    if request.method == "POST":
+        form = MaterialRequestForm(request.POST)
+        if form.is_valid():
+            material = form.save(commit=False)
+            material.submitted_by = request.user
+            material.type = "Material"
+            material.save()
+            return redirect('ict_member_dashboard')
+    else:
+        form = MaterialRequestForm()
+    return render(request, 'request_material.html', {'form': form})
+
+@login_required
+def ict_request_holiday(request):
+    if request.method == "POST":
+        form = HolidayRequestForm(request.POST)
+        if form.is_valid():
+            holiday = form.save(commit=False)
+            holiday.submitted_by = request.user
+            holiday.type = "Holiday"
+            holiday.save()
+            return redirect('ict_member_dashboard')
+    else:
+        form = HolidayRequestForm()
+    return render(request, 'request_holiday.html', {'form': form})
+
+@login_required
+def ict_request_appointment(request):
+    if request.method == "POST":
+        form = AppointmentRequestForm(request.POST)
+        if form.is_valid():
+            appointment = form.save(commit=False)
+            appointment.submitted_by = request.user
+            appointment.type = "Appointment"
+            appointment.save()
+            return redirect('ict_member_dashboard')
+    else:
+        form = AppointmentRequestForm()
+    return render(request, 'request_appointment.html', {'form': form})
+
+@login_required
+def ict_request_detail(request, pk):
+    req = get_object_or_404(Request, pk=pk)
+    return render(request, 'request_detail.html', {'req': req})
+
+@login_required
+def ict_request_edit(request, pk):
+    req = get_object_or_404(Request, pk=pk)
+    if request.method == "POST":
+        if req.status == "Pending":  # Only pending requests can be edited
+            form = MaterialRequestForm(request.POST, instance=req) if req.type=="Material" else \
+                   HolidayRequestForm(request.POST, instance=req) if req.type=="Holiday" else \
+                   AppointmentRequestForm(request.POST, instance=req)
+            if form.is_valid():
+                form.save()
+                return redirect('request_detail', pk=req.pk)
+    else:
+        form = MaterialRequestForm(instance=req) if req.type=="Material" else \
+               HolidayRequestForm(instance=req) if req.type=="Holiday" else \
+               AppointmentRequestForm(instance=req)
+    return render(request, 'request_edit.html', {'form': form, 'req': req})
+
+@login_required
+def ict_dashboard(request):
+    # Only ICT admin can access
+    if request.user.department != 'ICT' or request.user.is_staff == False:
+        return redirect('dashboard')  # Or show error
+
+    # Get ICT members
+    ict_members = CustomUser.objects.filter(department='ICT', is_staff=False)
+
+    # Get ICT member requests
+    pending_requests = Request.objects.filter(member__department='ICT', status='Pending')
+
+    context = {
+        'ict_members': ict_members,
+        'pending_requests': pending_requests
+    }
+    return render(request, 'dept/ict_dashboard.html', context)
+@login_required
+def approve_request(request, pk):
     
-    
-    return render(request, "ICT/admin/dashboard.html",{'user':user} )
+    if request.method == 'POST':
+        req = get_object_or_404(MaterialRequisition, pk=pk)
+        req.status = 'Approved'
+        req.save()
+    return redirect('ICT_dashboard',pk=pk)
+
+@login_required
+def reject_request(request,pk):
+    if request.method == 'POST':
+        req = get_object_or_404(MaterialRequisition, pk=pk)
+        req.status = 'Rejected'
+        req.save()
+    return redirect('ICT_dashboard',pk=pk)
+
+@login_required
+
+def forward_request(request, pk):
+    if request.method == 'POST':
+        # Get the requisition object
+        req = get_object_or_404(MaterialRequisition, pk=pk)
+
+        # Get the selected destination from the form (name="v")
+        next_department = request.POST.get('status')
+
+        if next_department:
+            req.next_department = next_department
+            req.status = "Forwarded"  # or "In Review", "Sent", etc.
+
+            req.save()
+
+        return redirect('ICT_dashboard', pk=pk)
+
+@login_required
+def ict_member_dashboard(request):
+   requests = MaterialRequisition.objects.filter(user=request.user).order_by('-created_at')
+   return render(request, "ICT/dashboard.html", {"requests": requests})
 
 @login_required(login_url="login")
 def procurement_dashboard(request,pk):
     user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
-
-    
-   
     return render(request, "Procurement/admin/dashboard.html",{'user':user})
 
 
@@ -289,11 +450,24 @@ def administration_dashboard(request,pk):
     return render(request, "Administration/admin/dashboard.html",{'user':user})
 
 @login_required(login_url="login")
-def userICT_dashboard(request,pk):
+def userICT_dashboard(request, pk):
     user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
     
-    
-    return render(request, "ICT/dashboard.html",{'user':user} )
+    material = MaterialRequisition.objects.filter(user=user)
+    holiday = HolidayLeaveRequest.objects.filter(user=user)
+    appointment = AppointmentRequest.objects.filter(user=user)
+
+    print("DEBUG: Dashboard for user =", user.username)
+    print("DEBUG: Material count =", material.count())
+    print("DEBUG: Holiday count =", holiday.count())
+    print("DEBUG: Appointment count =", appointment.count())
+
+    return render(request, "ICT/ictmember dashboard.html", {
+        'user': user,
+        'material': material,
+        'holiday': holiday,
+        'appointment': appointment
+    })
 
 @login_required(login_url="login")
 def userprocurement_dashboard(request,pk):
@@ -319,12 +493,12 @@ def useradministration_dashboard(request,pk):
     return render(request, "Administration/dashboard.html",{'user':user})
 
 @login_required(login_url="login")
-def request_material(request):
-    
+def request_material(request,pk):
+    user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
 
 
     if request.method == "POST":
-        form = MaterialRequisitionForm(request.POST)
+        form = MaterialRequestForm(request.POST)
         if form.is_valid():
             requisition = form.save(commit=False)
             requisition.user = request.user
@@ -332,16 +506,17 @@ def request_material(request):
             messages.success(request, "Material Requisition submitted successfully!")
             return redirect("request_material")  # redirect to same page or a list view
     else:
-        form = MaterialRequisitionForm()
+        form = MaterialRequestForm()
 
-    return render(request, "requests/request_material.html", {"form": form})
+    return render(request, "requests/request_material.html", {"form": form,"user":user})
 
 
 @login_required(login_url="login")
-def request_holiday(request):
-    
+def request_holiday(request,pk):
+    user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
+
     if request.method == "POST":
-        form = HolidayLeaveRequestForm(request.POST)
+        form = HolidayRequestForm(request.POST)
         if form.is_valid():
             leave_request = form.save(commit=False)
             leave_request.user = request.user
@@ -349,12 +524,14 @@ def request_holiday(request):
             messages.success(request, "Holiday Leave Request submitted successfully!")
             return redirect("request_holiday")  # redirect to same page or leave list
     else:
-        form = HolidayLeaveRequestForm()
+        form = HolidayRequestForm()
 
-    return render(request, "requests/request_holiday.html", {"form": form})
+    return render(request, "requests/request_holiday.html", {"form": form,"user":user})
 
 @login_required(login_url="login")
-def request_appointment(request):
+def request_appointment(request,pk):
+    user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
+
     if request.method == "POST":
         form = AppointmentRequestForm(request.POST)
         if form.is_valid():
@@ -367,7 +544,7 @@ def request_appointment(request):
         form = AppointmentRequestForm()
 
     
-    return render(request, "requests/request_appointment.html", {"form": form})
+    return render(request, "requests/request_appointment.html", {"form": form,"user":user})
 
 @login_required(login_url="login")
 def my_requests(request):
@@ -379,28 +556,29 @@ def my_requests(request):
     return render(request, "my_requests.html", {"my_requests": my_requests})
 @login_required
 def request_detail(request, pk):   # NEW (view only)
-    req = get_object_or_404(Request, pk=pk, requester=request.user)
+    req = get_object_or_404(Request, pk=pk, user=request.user)   # ✅ changed 'requester' → 'user'
     return render(request, "request_detail.html", {"req": req})
 
 
 @login_required
 def request_edit(request, pk):     # NEW (edit if pending)
-    req = get_object_or_404(Request, pk=pk, requester=request.user)
+    req = get_object_or_404(Request, pk=pk, user=request.user)   # ✅ secure query (only own requests)
 
-    if req.status != "Pending":  # lock editing if not pending
+    if req.status != "Pending":  # ✅ only allow editing pending
         messages.error(request, "You can only edit requests that are Pending.")
         return redirect("request_detail", pk=req.pk)
 
     if request.method == "POST":
-        form = RequestForm(request.POST, instance=req)
+        form = RequestForm(request.POST, instance=req)   # ✅ reuse generic RequestForm
         if form.is_valid():
             form.save()
             messages.success(request, "Request updated successfully.")
-            return redirect("request_detail", pk=req.pk)
+            return redirect("request_detail", pk=req.pk)   # ✅ redirect to detail after save
     else:
         form = RequestForm(instance=req)
 
     return render(request, "request_edit.html", {"form": form, "req": req})
+
 
 @login_required(login_url="login")
 def approvals(request):
@@ -441,4 +619,62 @@ def profile(request):
         messages.error(request, f"Something went wrong: {e}")
         form = ProfileForm(instance=request.user)
 
-    return render(request, "profile.html", {"form": form})
+    return render(request, "profile.html", {"form": form})@login_required
+
+def update_material_req(request, pk):
+    material_req = get_object_or_404(MaterialRequisition, pk=pk)
+
+    if request.method == 'POST':
+        form = MaterialRequestForm(request.POST, instance=material_req)
+        if form.is_valid():
+            form.save()
+            # log the update
+            messages.success(request, "✅ Material request updated successfully.")
+
+            return redirect('update_material_req', pk=pk)
+        
+
+    else:
+        form = MaterialRequestForm(instance=material_req)
+
+    return render(request, 'update_material_req.html', {'form': form, 'material_req': material_req})
+
+
+
+def update_holiday_req(request, pk):
+    holiday_req = get_object_or_404(HolidayLeaveRequest, pk=pk)
+
+    if request.method == 'POST':
+        form = HolidayRequestForm(request.POST, instance=holiday_req)
+        if form.is_valid():
+            form.save()
+            # log the update
+            messages.success(request, "✅ Holiday request updated successfully.")
+
+            return redirect('update_holiday_req', pk=pk)
+        
+
+    else:
+        form = HolidayRequestForm(instance=holiday_req)
+
+    return render(request, 'update_holiday_req.html', {'form': form, 'holiday_req': holiday_req})
+
+def update_appointment_req(request, pk):
+    appointment_req = get_object_or_404(AppointmentRequest, pk=pk)
+
+    if request.method == 'POST':
+        form = AppointmentRequestForm(request.POST, instance=appointment_req)
+        if form.is_valid():
+            form.save()
+            # log the update
+            messages.success(request, "✅ Appointment request updated successfully.")
+
+            return redirect('update_appointment_req', pk=pk)
+        
+
+    else:
+        form = AppointmentRequestForm(instance=appointment_req)
+
+    return render(request, 'update_appointment_req.html', {'form': form, 'appointment_req': appointment_req})
+
+

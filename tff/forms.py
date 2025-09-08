@@ -13,7 +13,7 @@ class RequestForm(forms.ModelForm):
 
 
 
-class MaterialRequisitionForm(forms.ModelForm):
+class MaterialRequestForm(forms.ModelForm):
     class Meta:
         model = MaterialRequisition
         fields = ["item_name", "quantity", "unit", "department", "purpose"]
@@ -27,7 +27,7 @@ class MaterialRequisitionForm(forms.ModelForm):
         }
 
 
-class HolidayLeaveRequestForm(forms.ModelForm):
+class HolidayRequestForm(forms.ModelForm):
     class Meta:
         model = HolidayLeaveRequest
         fields = ["start_date", "end_date", "reason"]
