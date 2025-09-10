@@ -517,10 +517,139 @@ def procurement_dashboard(request,pk):
 
 @login_required(login_url="login")
 def hr_dashboard(request,pk):
-    user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
+    user = get_object_or_404(CustomUser, pk=pk) 
+    department = user.department # always the logged-in user
+    material = MaterialRequisition.objects.filter(status="pending",department=department)
+    holiday = HolidayLeaveRequest.objects.filter(status="pending",department=department)
+    appointment = AppointmentRequest.objects.filter(status="pending",department=department)
+    pending_requests = MaterialRequisition.objects.filter(status="pending",department=department)
+    pending_requests_holiday = HolidayLeaveRequest.objects.filter(status="pending",department=department)
+    pending_requests_appointment = AppointmentRequest.objects.filter(status="pending",department=department)
 
-   
-    return render(request, "Hr/admin/dashboard.html",{'user':user})
+
+    print("DEBUG: Material count =", material.count())
+    print("DEBUG: Pending Hr Requests =", pending_requests.count())
+    print("DEBUG: holiday count =", holiday.count())
+    print("DEBUG: Pending Hr Requests =", pending_requests.count())
+    print("DEBUG: appointment count =", appointment.count())
+    print("DEBUG: Pending Hr Requests =", pending_requests.count())
+
+    return render(
+        request,
+        "Hr/admin/dashboard.html",
+        {
+            'user': user,
+            "material": material,
+            "holiday":holiday,
+            "appointment":appointment,
+            "pending_requests_appointment ":pending_requests_appointment,
+            "pending_requests_holiday ":pending_requests_holiday, 
+            "pending_requests": pending_requests
+        }
+    )
+
+@login_required
+def approve_request(request, pk):
+    
+    if request.method == 'POST':
+        req = get_object_or_404(MaterialRequisition, pk=pk)
+        req.status = 'Approved'
+        req.save()
+    return redirect('Hr_dashboard',pk=pk)
+
+@login_required
+def reject_request(request,pk):
+    if request.method == 'POST':
+        req = get_object_or_404(MaterialRequisition, pk=pk)
+        req.status = 'Rejected'
+        req.save()
+    return redirect('Hr_dashboard',pk=pk)
+
+@login_required
+
+def forward_request(request, pk):
+    if request.method == 'POST':
+        # Get the requisition object
+        req = get_object_or_404(MaterialRequisition, pk=pk)
+
+        # Get the selected destination from the form (name="v")
+        next_department = request.POST.get('status')
+
+        if next_department:
+            req.next_department = next_department
+            req.status = "Forwarded"  # or "In Review", "Sent", etc.
+
+            req.save()
+
+        return redirect('Hr_dashboard', pk=pk)
+    # ===========================
+#   HOLIDAY REQUEST ACTIONS
+# ===========================
+@login_required
+def approve_holiday(request, pk):
+    if request.method == 'POST':
+        req = get_object_or_404(HolidayLeaveRequest, pk=pk)
+        req.status = 'Approved'
+        req.save()
+    return redirect('Hr_dashboard', pk=pk)
+
+
+@login_required
+def reject_holiday(request, pk):
+    if request.method == 'POST':
+        req = get_object_or_404(HolidayLeaveRequest, pk=pk)
+        req.status = 'Rejected'
+        req.save()
+    return redirect('Hr_dashboard', pk=pk)
+
+
+@login_required
+def forward_holiday(request, pk):
+    if request.method == 'POST':
+        req = get_object_or_404(HolidayLeaveRequest, pk=pk)
+        next_department = request.POST.get('status')
+
+        if next_department:
+            req.next_department = next_department
+            req.status = "Forwarded"
+            req.save()
+
+    return redirect('Hr_dashboard', pk=pk)
+
+
+# ===============================
+#   APPOINTMENT REQUEST ACTIONS
+# ===============================
+@login_required
+def approve_appointment(request, pk):
+    if request.method == 'POST':
+        req = get_object_or_404(AppointmentRequest, pk=pk)
+        req.status = 'Approved'
+        req.save()
+    return redirect('Hr_dashboard', pk=pk)
+
+
+@login_required
+def reject_appointment(request, pk):
+    if request.method == 'POST':
+        req = get_object_or_404(AppointmentRequest, pk=pk)
+        req.status = 'Rejected'
+        req.save()
+    return redirect('Hr_dashboard', pk=pk)
+
+
+@login_required
+def forward_appointment(request, pk):
+    if request.method == 'POST':
+        req = get_object_or_404(AppointmentRequest, pk=pk)
+        next_department = request.POST.get('status')
+
+        if next_department:
+            req.next_department = next_department
+            req.status = "Forwarded"
+            req.save()
+    return redirect('Hr_dashboard', pk=pk)    
+    
 
 @login_required(login_url="login")
 def administration_dashboard(request,pk):
@@ -552,18 +681,46 @@ def userICT_dashboard(request, pk):
 @login_required(login_url="login")
 def userprocurement_dashboard(request,pk):
     user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
+    material = MaterialRequisition.objects.filter(user=user)
+    holiday = HolidayLeaveRequest.objects.filter(user=user)
+    appointment = AppointmentRequest.objects.filter(user=user)
+
+    print("DEBUG: Dashboard for user =", user.username)
+    print("DEBUG: Material count =", material.count())
+    print("DEBUG: Holiday count =", holiday.count())
+    print("DEBUG: Appointment count =", appointment.count())
 
     
    
-    return render(request, "Procurement/dashboard.html",{'user':user})
+    return render(request, "Procurement/procurementmember dashboard.html",{
+        'user': user,
+        'material': material,
+        'holiday': holiday,
+        'appointment': appointment
+
+    })
 
 
 @login_required(login_url="login")
 def userhr_dashboard(request,pk):
     user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
+    
+    material = MaterialRequisition.objects.filter(user=user)
+    holiday = HolidayLeaveRequest.objects.filter(user=user)
+    appointment = AppointmentRequest.objects.filter(user=user)
 
-   
-    return render(request, "Hr/dashboard.html",{'user':user})
+    print("DEBUG: Dashboard for user =", user.username)
+    print("DEBUG: Material count =", material.count())
+    print("DEBUG: Holiday count =", holiday.count())
+    print("DEBUG: Appointment count =", appointment.count())
+
+    return render(request, "Hr/hrmember dashboard.html", {
+        'user': user,
+        'material': material,
+        'holiday': holiday,
+        'appointment': appointment
+    })
+
 
 @login_required(login_url="login")
 def useradministration_dashboard(request,pk):

@@ -1,136 +1,224 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TFF Management System</title>
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
 
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Custom Styles -->
-  <style>
-    body { background: #f8fafc; }
-    .navbar-brand { font-weight: 700; letter-spacing: .3px; }
-    .page-title { font-size: 1.25rem; font-weight: 600; }
-    .card { border: 0; border-radius: 1rem; box-shadow: 0 4px 20px rgba(0, 0, 0, .05); }
-    footer { font-size: .9rem; color: #6c757d; }
-    .sidebar {
-      padding: 1rem;
-      background: #fff;
-      border-right: 1px solid #e5e7eb;
-      min-height: 100vh;
-    }
-    .sidebar a {
-      display: block;
-      padding: .5rem 0;
-      text-decoration: none;
-      color: #000;
-    }
-    .dropdown-wrapper { margin-top: 1rem; }
-    .dropdown-btn { cursor: pointer; font-weight: 600; }
-    .dropdown-container { display: none; padding-left: 1rem; }
-    .arrow { font-size: .8rem; }
-  </style>
-
-  {% load static %}
-</head>
-<body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="">TFF Request MS</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div id="nav" class="collapse navbar-collapse">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item"><a class="nav-link" href="">Dashboard</a></li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Submit Request</a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{% url 'request_material'%}">Material Requisition</a></li>
-              <li><a class="dropdown-item" href="{% url 'request_holiday'%}">Holiday Leave</a></li>
-              <li><a class="dropdown-item" href="{%url 'request_appointment'%}">Appointment</a></li>
-            </ul>
-          </li>
-          <li class="nav-item"><a class="nav-link" href="{%url 'my_requests'%}">My Requests</a></li>
-          <li class="nav-item"><a class="nav-link" href="{%url 'approvals'%}">Approvals</a></li>
-          <li class="nav-item"><a class="nav-link" href="{%url 'finance'%}">Finance</a></li>
-        </ul>
-
-        <ul class="navbar-nav">
-          {% if request.user.is_authenticated %}
-            <li class="nav-item"><a class="nav-link" href="{%url 'profile'%}">Profile</a></li>
-            <li class="nav-item"><a class="nav-link" href="">Logout</a></li>
-          {% else %}
-            <li class="nav-item"><a class="nav-link" href="">Login</a></li>
-            <li class="nav-item"><a class="nav-link" href="">Register</a></li>
-          {% endif %}
-        </ul>
-      </div>
+  <!-- Section 1: Register procurement Member -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>Register procurement Member</h5>
     </div>
-  </nav>
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h5 class="fw-bold">TFF Management</h5>
-    <small class="text-muted">TFF Management System</small>
-
-    <a href="">📊 Dashboard</a>
-
-    <!-- Dropdown for Users -->
-    <div class="dropdown-wrapper">
-      <div class="dropdown-btn" onclick="toggleDropdown('userDropdown')">
-        👥 Manage Users <span class="arrow">▼</span>
-      </div>
-      <div class="dropdown-container" id="userDropdown">
-        <a href="">Administration</a>
-        <a href="">Procurement</a>
-      </div>
+    <div class="card-body">
+      <a href="{% url 'Procurementregister' %}" class="btn btn-primary">Register New procurement Member</a>
     </div>
-
-    <!-- Quick Links -->
-    <a href="">Administration</a>
-    <a href="">Procurement</a>
-    <a href="">Finance</a>
-    <a href="">HR</a>
-    <a href="">ICT</a>
-    <a href="{% url 'Procurementregister' %}">Register</a>
   </div>
 
-  <!-- Navbar -->
-  
-  <!-- Main Content -->
-  <main class="container py-4">
-    {% if messages %}
-      <div class="mb-3">
-        {% for m in messages %}
-          <div class="alert alert-{{ m.tags|default:'info' }} mb-2">{{ m }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
-    {% block content %}{% endblock %}
-  </main>
-
-  <!-- Footer -->
-  <footer class="border-top py-4">
-    <div class="container d-flex justify-content-between">
-      <span>© {% now "Y" %} TFF Request MS</span>
-      <span>Transparency • Accountability • Speed</span>
+  <!-- Section 2: procurement Member Requests -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>Material Requests</h5>
     </div>
-  </footer>
+    <div class="card-body">
+      {% if pending_requests %}
+     
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr>
+                              <th>Requester</th>
 
-  <script>
-    // Toggle dropdowns in sidebar
-    function toggleDropdown(id) {
-      var dropdown = document.getElementById(id);
-      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-    }
-  </script>
-</body>
-</html>
+                <th>Item name</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Department</th>
+                <th>Purpose</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in material %}
+            <tr>
+                          <td>{{ req.user.username }}</td>
+
+                <td>{{ req.item_name }}</td>
+                <td>{{ req.quantity }}</td>
+                <td>{{ req.unit }}</td>
+                <td>{{ req.department }}</td>
+                <td>{{ req.purpose }}</td>
+                <td>{{ req.status }}</td>
+                 <td>
+              <form method="post" action="{% url 'approve_request' req.id %}" style="display:inline;">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-success btn-sm">Approve</button>
+</form>
+<form method="post" action="{% url 'reject_request' req.id %}" style="display:inline;">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+</form>
+<form method="post" action="{% url 'forward_request' req.id %}" style="display: inline;">
+  {% csrf_token %}
+  
+  <div class="form-group" style="display: inline-block; margin-right: 8px;">
+    <select name="status" class="form-select form-select-sm" required>
+      <option value="" disabled selected>Select destination</option>
+      <option value="HR">HR</option>
+      <option value="Procurement">ICT</option>
+      <option value="Finance">Finance</option>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-sm">Forward</button>
+</form>
+
+
+            </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No requests material request submitted yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+   
+
+      {% else %}
+      <p>No pending material requests .</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+<!-- Section 3: Holiday Requests -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>Holiday Requests</h5>
+    </div>
+    <div class="card-body">
+      {% if holiday %}
+      <table class="table table-bordered mt-2">
+        <thead>
+          <tr>
+            <th>Requester</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in holiday %}
+          <tr>
+            <td>{{ req.user.username }}</td>
+            <td>{{ req.start_date }}</td>
+            <td>{{ req.end_date }}</td>
+            <td>{{ req.reason }}</td>
+            <td>{{ req.status }}</td>
+            <td>
+              <form method="post" action="{% url 'approve_holiday' req.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+              </form>
+              <form method="post" action="{% url 'reject_holiday' req.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+              </form>
+              <form method="post" action="{% url 'forward_request' req.id %}" style="display: inline;">
+  {% csrf_token %}
+  
+  <div class="form-group" style="display: inline-block; margin-right: 8px;">
+    <select name="status" class="form-select form-select-sm" required>
+      <option value="" disabled selected>Select destination</option>
+      <option value="HR">HR</option>
+      <option value="Procurement">ICT</option>
+      <option value="Finance">Finance</option>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-sm">Forward</button>
+</form>
+
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">No holiday requests submitted yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No pending holiday requests.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Section 4: Appointment Requests -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>Appointment Requests</h5>
+    </div>
+    <div class="card-body">
+      {% if appointment %}
+      <table class="table table-bordered mt-2">
+        <thead>
+          <tr>
+            <th>Requester</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Purpose</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in appointment %}
+          <tr>
+            <td>{{ req.user.username }}</td>
+            <td>{{ req.date }}</td>
+            <td>{{ req.time }}</td>
+            <td>{{ req.purpose }}</td>
+            <td>{{ req.status }}</td>
+            <td>
+              <form method="post" action="{% url 'approve_appointment' req.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+              </form>
+              <form method="post" action="{% url 'reject_appointment' req.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+              </form>
+              <form method="post" action="{% url 'forward_request' req.id %}" style="display: inline;">
+  {% csrf_token %}
+  
+  <div class="form-group" style="display: inline-block; margin-right: 8px;">
+    <select name="status" class="form-select form-select-sm" required>
+      <option value="" disabled selected>Select destination</option>
+      <option value="HR">HR</option>
+      <option value="Procurement">ICT</option>
+      <option value="Finance">Finance</option>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-sm">Forward</button>
+</form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">No appointment requests submitted yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No pending appointment requests.</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+
+{% endblock %}

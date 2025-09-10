@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>HR Member Dashboard</h2>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <a href="{% url 'request_material' user.pk %}" class="btn btn-primary w-100 mb-3">Request Material</a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'request_holiday' user.pk %}" class="btn btn-success w-100 mb-3">Request Holiday</a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'request_appointment' user.pk %}" class="btn btn-warning w-100 mb-3">Request Appointment</a>
+        </div>
+    </div>
+    <h3 class="mt-4">My Material Requests</h3>
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr>
+                <th>Item name</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Purpose</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in material %}
+            <tr>
+                <td>{{ req.item_name }}</td>
+                <td>{{ req.quantity }}</td>
+                <td>{{ req.unit }}</td>
+                <td>{{ req.purpose }}</td>
+                <td>{{ req.status }}</td>
+                <td>
+                    <a href="{% url 'request_detail' req.pk %}" class="btn btn-sm btn-info">View</a>
+                    <a href="{% url 'update_material_req' req.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No requests submitted yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+        <h3 class="mt-4">My Holiday Requests</h3>
+
+
+     <table class="table table-bordered mt-2">
+        <thead>
+            <tr>
+                <th>Start date</th>
+                <th>End date</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hol in holiday %}
+            <tr>
+                <td>{{ hol.start_date }}</td>
+                <td>{{ hol.end_date }}</td>
+                <td>{{ hol.reason }}</td>
+                <td>{{ hol.status }}</td>
+                <td>
+                    <a href="{% url 'request_detail' hol.pk %}" class="btn btn-sm btn-info">View</a>
+                    <a href="{% url 'update_holiday_req' hol.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No requests submitted yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+        <h3 class="mt-4">My Appointment Requests</h3>
+
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>With</th>
+                <th>Purpose</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in appointment %}
+            <tr>
+                <td>{{ app.date }}</td>
+                <td>{{ app.time }}</td>
+                <td>{{ app.with_whom }}</td>
+                <td>{{ app.purpose }}</td>
+                <td>{{ app.status }}</td>
+                <td>
+                    <a href="{% url 'request_detail' app.pk %}" class="btn btn-sm btn-info">View</a>
+                    <a href="{% url 'update_appointment_req' app.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No requests submitted yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
