@@ -18,7 +18,7 @@
       <h5>Material Requests</h5>
     </div>
     <div class="card-body">
-      {% if pending_requests %}
+      {% if material %}
      
 
     <table class="table table-bordered mt-2">
@@ -51,18 +51,17 @@
   {% csrf_token %}
   <button type="submit" class="btn btn-success btn-sm">Approve</button>
 </form>
-<form method="post" action="{% url 'reject_request' req.id %}" style="display:inline;">
+<form method="post" action="{% url 'ictreject_request' req.id %}" style="display:inline;">
   {% csrf_token %}
   <button type="submit" class="btn btn-danger btn-sm">Reject</button>
 </form>
-<form method="post" action="{% url 'forward_request' req.id %}" style="display: inline;">
+<form method="post" action="{% url 'ictforward_request' req.id %}" style="display: inline;">
   {% csrf_token %}
   
   <div class="form-group" style="display: inline-block; margin-right: 8px;">
     <select name="status" class="form-select form-select-sm" required>
       <option value="" disabled selected>Select destination</option>
       <option value="HR">HR</option>
-      <option value="Procurement">Procurement</option>
       <option value="Finance">Finance</option>
     </select>
   </div>
@@ -124,14 +123,13 @@
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger btn-sm">Reject</button>
               </form>
-              <form method="post" action="{% url 'forward_request' req.id %}" style="display: inline;">
+ <form method="post" action="{% url 'ictforward_request' req.id %}" style="display: inline;">
   {% csrf_token %}
   
   <div class="form-group" style="display: inline-block; margin-right: 8px;">
     <select name="status" class="form-select form-select-sm" required>
       <option value="" disabled selected>Select destination</option>
       <option value="HR">HR</option>
-      <option value="Procurement">Procurement</option>
       <option value="Finance">Finance</option>
     </select>
   </div>
@@ -154,69 +152,6 @@
     </div>
   </div>
 
-  <!-- Section 4: Appointment Requests -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h5>Appointment Requests</h5>
-    </div>
-    <div class="card-body">
-      {% if appointment %}
-      <table class="table table-bordered mt-2">
-        <thead>
-          <tr>
-            <th>Requester</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Purpose</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for req in appointment %}
-          <tr>
-            <td>{{ req.user.username }}</td>
-            <td>{{ req.date }}</td>
-            <td>{{ req.time }}</td>
-            <td>{{ req.purpose }}</td>
-            <td>{{ req.status }}</td>
-            <td>
-              <form method="post" action="{% url 'approve_appointment' req.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success btn-sm">Approve</button>
-              </form>
-              <form method="post" action="{% url 'reject_appointment' req.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-              </form>
-              <form method="post" action="{% url 'forward_request' req.id %}" style="display: inline;">
-  {% csrf_token %}
-  
-  <div class="form-group" style="display: inline-block; margin-right: 8px;">
-    <select name="status" class="form-select form-select-sm" required>
-      <option value="" disabled selected>Select destination</option>
-      <option value="HR">HR</option>
-      <option value="Procurement">Procurement</option>
-      <option value="Finance">Finance</option>
-    </select>
-  </div>
-
-  <button type="submit" class="btn btn-primary btn-sm">Forward</button>
-</form>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="6">No appointment requests submitted yet.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% else %}
-      <p>No pending appointment requests.</p>
-      {% endif %}
-    </div>
-  </div>
 
 </div>
 

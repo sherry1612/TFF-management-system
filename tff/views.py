@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib.auth.models import User
 from .models import Request  
-
 from .forms import RequestForm
 from .models import *
 from .forms import *
@@ -288,24 +287,16 @@ def all_requests(request):
 
 
 @login_required(login_url="login")
-def ICT_dashboard(request,pk):
-    user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
-    material = MaterialRequisition.objects.filter(status="pending")
-    holiday = HolidayLeaveRequest.objects.filter(status="pending")
-    appointment = AppointmentRequest.objects.filter(status="pending")
-    pending_requests = MaterialRequisition.objects.filter(status="pending")
-    pending_requests_holiday = HolidayLeaveRequest.objects.filter(status="pending")
-    pending_requests_appointment = AppointmentRequest.objects.filter(status="pending")
-
-
-    print("DEBUG: Material count =", material.count())
-    print("DEBUG: Pending ICT Requests =", pending_requests.count())
-    print("DEBUG: holiday count =", holiday.count())
-    print("DEBUG: Pending ICT Requests =", pending_requests.count())
-    print("DEBUG: appointment count =", appointment.count())
-    print("DEBUG: Pending ICT Requests =", pending_requests.count())
-
-    return render(
+def ICT_dashboard(request, pk):
+        user = request.user
+    
+        user = get_object_or_404(CustomUser, pk=pk) 
+        department = user.department # always the logged-in user
+        material = MaterialRequisition.objects.filter(status="pending")
+        holiday = HolidayLeaveRequest.objects.filter(status="pending")
+        appointment = AppointmentRequest.objects.filter(status="pending")
+    
+        return render(
         request,
         "ICT/admin/dashboard.html",
         {
@@ -313,14 +304,10 @@ def ICT_dashboard(request,pk):
             "material": material,
             "holiday":holiday,
             "appointment":appointment,
-            "pending_requests_appointment ":pending_requests_appointment,
-            "pending_requests_holiday ":pending_requests_holiday, 
-            "pending_requests": pending_requests
+           
         }
     )
 @login_required
-
-
 def ict_request_material(request):
     if request.method == "POST":
         form = MaterialRequestForm(request.POST)
@@ -334,19 +321,7 @@ def ict_request_material(request):
         form = MaterialRequestForm()
     return render(request, 'request_material.html', {'form': form})
 
-@login_required
-def ict_request_holiday(request):
-    if request.method == "POST":
-        form = HolidayRequestForm(request.POST)
-        if form.is_valid():
-            holiday = form.save(commit=False)
-            holiday.submitted_by = request.user
-            holiday.type = "Holiday"
-            holiday.save()
-            return redirect('ict_member_dashboard')
-    else:
-        form = HolidayRequestForm()
-    return render(request, 'request_holiday.html', {'form': form})
+
 
 @login_required
 def ict_request_appointment(request):
@@ -361,11 +336,6 @@ def ict_request_appointment(request):
     else:
         form = AppointmentRequestForm()
     return render(request, 'request_appointment.html', {'form': form})
-
-@login_required
-def ict_request_detail(request, pk):
-    req = get_object_or_404(Request, pk=pk)
-    return render(request, 'request_detail.html', {'req': req})
 
 @login_required
 def ict_request_edit(request, pk):
@@ -402,7 +372,7 @@ def ict_dashboard(request):
     }
     return render(request, 'dept/ict_dashboard.html', context)
 @login_required
-def approve_request(request, pk):
+def ictapprove_request(request, pk):
     
     if request.method == 'POST':
         req = get_object_or_404(MaterialRequisition, pk=pk)
@@ -411,7 +381,7 @@ def approve_request(request, pk):
     return redirect('ICT_dashboard',pk=pk)
 
 @login_required
-def reject_request(request,pk):
+def ictreject_request(request,pk):
     if request.method == 'POST':
         req = get_object_or_404(MaterialRequisition, pk=pk)
         req.status = 'Rejected'
@@ -420,16 +390,20 @@ def reject_request(request,pk):
 
 @login_required
 
-def forward_request(request, pk):
+def ictforward_request(request, pk):
     if request.method == 'POST':
         # Get the requisition object
         req = get_object_or_404(MaterialRequisition, pk=pk)
+        
+
 
         # Get the selected destination from the form (name="v")
         next_department = request.POST.get('status')
 
         if next_department:
             req.next_department = next_department
+            req.department = next_department  # ✅ Update the current department
+
             req.status = "Forwarded"  # or "In Review", "Sent", etc.
 
             req.save()
@@ -439,7 +413,7 @@ def forward_request(request, pk):
 #   HOLIDAY REQUEST ACTIONS
 # ===========================
 @login_required
-def approve_holiday(request, pk):
+def ictapprove_holiday(request, pk):
     if request.method == 'POST':
         req = get_object_or_404(HolidayLeaveRequest, pk=pk)
         req.status = 'Approved'
@@ -448,7 +422,7 @@ def approve_holiday(request, pk):
 
 
 @login_required
-def reject_holiday(request, pk):
+def ictreject_holiday(request, pk):
     if request.method == 'POST':
         req = get_object_or_404(HolidayLeaveRequest, pk=pk)
         req.status = 'Rejected'
@@ -457,7 +431,7 @@ def reject_holiday(request, pk):
 
 
 @login_required
-def forward_holiday(request, pk):
+def ictforward_holiday(request, pk):
     if request.method == 'POST':
         req = get_object_or_404(HolidayLeaveRequest, pk=pk)
         next_department = request.POST.get('status')
@@ -474,7 +448,7 @@ def forward_holiday(request, pk):
 #   APPOINTMENT REQUEST ACTIONS
 # ===============================
 @login_required
-def approve_appointment(request, pk):
+def ictapprove_appointment(request, pk):
     if request.method == 'POST':
         req = get_object_or_404(AppointmentRequest, pk=pk)
         req.status = 'Approved'
@@ -483,7 +457,7 @@ def approve_appointment(request, pk):
 
 
 @login_required
-def reject_appointment(request, pk):
+def ictreject_appointment(request, pk):
     if request.method == 'POST':
         req = get_object_or_404(AppointmentRequest, pk=pk)
         req.status = 'Rejected'
@@ -492,7 +466,7 @@ def reject_appointment(request, pk):
 
 
 @login_required
-def forward_appointment(request, pk):
+def ictforward_appointment(request, pk):
     if request.method == 'POST':
         req = get_object_or_404(AppointmentRequest, pk=pk)
         next_department = request.POST.get('status')
@@ -512,31 +486,27 @@ def ict_member_dashboard(request):
 @login_required(login_url="login")
 def procurement_dashboard(request,pk):
     user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
-    return render(request, "Procurement/admin/dashboard.html",{'user':user})
-
-
-@login_required(login_url="login")
-def hr_dashboard(request,pk):
-    user = get_object_or_404(CustomUser, pk=pk) 
     department = user.department # always the logged-in user
-    material = MaterialRequisition.objects.filter(status="pending",department=department)
-    holiday = HolidayLeaveRequest.objects.filter(status="pending",department=department)
-    appointment = AppointmentRequest.objects.filter(status="pending",department=department)
-    pending_requests = MaterialRequisition.objects.filter(status="pending",department=department)
-    pending_requests_holiday = HolidayLeaveRequest.objects.filter(status="pending",department=department)
-    pending_requests_appointment = AppointmentRequest.objects.filter(status="pending",department=department)
+    material = MaterialRequisition.objects.filter(status="pending")
+    holiday = HolidayLeaveRequest.objects.filter(status="pending")
+    appointment = AppointmentRequest.objects.filter(status="pending")
+    pending_requests = MaterialRequisition.objects.filter(status="pending")
+    pending_requests_holiday = HolidayLeaveRequest.objects.filter(status="pending")
+    pending_requests_appointment = AppointmentRequest.objects.filter(status="pending")
 
 
     print("DEBUG: Material count =", material.count())
-    print("DEBUG: Pending Hr Requests =", pending_requests.count())
+    print("DEBUG: Pending Procurement Requests =", pending_requests.count())
+    print("DEBUG: Pending  Requests =", pending_requests.count())
     print("DEBUG: holiday count =", holiday.count())
-    print("DEBUG: Pending Hr Requests =", pending_requests.count())
+    print("DEBUG: Pending Procurement Requests =", pending_requests.count())
+    print("DEBUG: Pending  Requests =", pending_requests.count())
     print("DEBUG: appointment count =", appointment.count())
-    print("DEBUG: Pending Hr Requests =", pending_requests.count())
+    print("DEBUG: Pending Procurement Requests =", pending_requests.count())
 
     return render(
         request,
-        "Hr/admin/dashboard.html",
+        "Procurement/admin/dashboard.html",
         {
             'user': user,
             "material": material,
@@ -549,7 +519,7 @@ def hr_dashboard(request,pk):
     )
 
 @login_required
-def approve_request(request, pk):
+def hrapprove_request(request, pk):
     
     if request.method == 'POST':
         req = get_object_or_404(MaterialRequisition, pk=pk)
@@ -558,16 +528,60 @@ def approve_request(request, pk):
     return redirect('Hr_dashboard',pk=pk)
 
 @login_required
-def reject_request(request,pk):
+def hrreject_request(request,pk):
     if request.method == 'POST':
         req = get_object_or_404(MaterialRequisition, pk=pk)
         req.status = 'Rejected'
         req.save()
     return redirect('Hr_dashboard',pk=pk)
+    
+
+
+@login_required(login_url="login")
+def hr_dashboard(request,pk):
+    user = get_object_or_404(CustomUser, pk=pk) 
+    department = user.department # always the logged-in user
+    holiday = HolidayLeaveRequest.objects.filter(status="Forwarded")
+    appointment = AppointmentRequest.objects.filter(status="pending")
+    pending_requests = MaterialRequisition.objects.filter(status="pending")
+    pending_requests_holiday = HolidayLeaveRequest.objects.filter(status="pending")
+    pending_requests_appointment = AppointmentRequest.objects.filter(status="pending")
+
+
+
+    return render(
+        request,
+        "Hr/admin/dashboard.html",
+        {
+            'user': user,
+            "holiday":holiday,
+            "appointment":appointment,
+            "pending_requests_appointment ":pending_requests_appointment,
+            "pending_requests_holiday ":pending_requests_holiday, 
+            "pending_requests": pending_requests
+        }
+    )
+
+@login_required
+def hrapprove_request(request, pk):
+    
+    if request.method == 'POST':
+        req = get_object_or_404(MaterialRequisition, pk=pk)
+        req.status = 'Approved'
+        req.save()
+    return redirect('Hr_dashboard',pk=pk)
+
+@login_required
+def hrreject_request(request,pk):
+    if request.method == 'POST':
+        req = get_object_or_404(MaterialRequisition, pk=pk)
+        req.status = 'Rejected'
+        req.save()
+    return redirect('hr_dashboard',pk=pk)
 
 @login_required
 
-def forward_request(request, pk):
+def hrforward_request(request, pk):
     if request.method == 'POST':
         # Get the requisition object
         req = get_object_or_404(MaterialRequisition, pk=pk)
@@ -581,12 +595,12 @@ def forward_request(request, pk):
 
             req.save()
 
-        return redirect('Hr_dashboard', pk=pk)
+        return redirect('hr_dashboard', pk=pk)
     # ===========================
 #   HOLIDAY REQUEST ACTIONS
 # ===========================
 @login_required
-def approve_holiday(request, pk):
+def hrapprove_holiday(request, pk):
     if request.method == 'POST':
         req = get_object_or_404(HolidayLeaveRequest, pk=pk)
         req.status = 'Approved'
@@ -595,7 +609,7 @@ def approve_holiday(request, pk):
 
 
 @login_required
-def reject_holiday(request, pk):
+def hrreject_holiday(request, pk):
     if request.method == 'POST':
         req = get_object_or_404(HolidayLeaveRequest, pk=pk)
         req.status = 'Rejected'
@@ -604,7 +618,7 @@ def reject_holiday(request, pk):
 
 
 @login_required
-def forward_holiday(request, pk):
+def hrforward_holiday(request, pk):
     if request.method == 'POST':
         req = get_object_or_404(HolidayLeaveRequest, pk=pk)
         next_department = request.POST.get('status')
@@ -621,7 +635,7 @@ def forward_holiday(request, pk):
 #   APPOINTMENT REQUEST ACTIONS
 # ===============================
 @login_required
-def approve_appointment(request, pk):
+def hrapprove_appointment(request, pk):
     if request.method == 'POST':
         req = get_object_or_404(AppointmentRequest, pk=pk)
         req.status = 'Approved'
@@ -630,7 +644,7 @@ def approve_appointment(request, pk):
 
 
 @login_required
-def reject_appointment(request, pk):
+def hrreject_appointment(request, pk):
     if request.method == 'POST':
         req = get_object_or_404(AppointmentRequest, pk=pk)
         req.status = 'Rejected'
@@ -639,7 +653,7 @@ def reject_appointment(request, pk):
 
 
 @login_required
-def forward_appointment(request, pk):
+def hrforward_appointment(request, pk):
     if request.method == 'POST':
         req = get_object_or_404(AppointmentRequest, pk=pk)
         next_department = request.POST.get('status')
@@ -648,7 +662,7 @@ def forward_appointment(request, pk):
             req.next_department = next_department
             req.status = "Forwarded"
             req.save()
-    return redirect('Hr_dashboard', pk=pk)    
+    return redirect('Hr_dashboard')    
     
 
 @login_required(login_url="login")
@@ -664,18 +678,15 @@ def userICT_dashboard(request, pk):
     
     material = MaterialRequisition.objects.filter(user=user)
     holiday = HolidayLeaveRequest.objects.filter(user=user)
-    appointment = AppointmentRequest.objects.filter(user=user)
 
     print("DEBUG: Dashboard for user =", user.username)
     print("DEBUG: Material count =", material.count())
     print("DEBUG: Holiday count =", holiday.count())
-    print("DEBUG: Appointment count =", appointment.count())
 
     return render(request, "ICT/ictmember dashboard.html", {
         'user': user,
         'material': material,
         'holiday': holiday,
-        'appointment': appointment
     })
 
 @login_required(login_url="login")
@@ -741,7 +752,7 @@ def request_material(request,pk):
             requisition.user = request.user
             requisition.save()
             messages.success(request, "Material Requisition submitted successfully!")
-            return redirect("request_material")  # redirect to same page or a list view
+            return redirect("request_material",pk=user.pk)  # redirect to same page or a list view
     else:
         form = MaterialRequestForm()
 
@@ -759,7 +770,7 @@ def request_holiday(request,pk):
             leave_request.user = request.user
             leave_request.save()
             messages.success(request, "Holiday Leave Request submitted successfully!")
-            return redirect("request_holiday")  # redirect to same page or leave list
+            return redirect("request_holiday",pk=user.pk)  # redirect to same page or leave list
     else:
         form = HolidayRequestForm()
 
@@ -776,7 +787,7 @@ def request_appointment(request,pk):
             appointment.user = request.user
             appointment.save()
             messages.success(request, "Appointment Request submitted successfully!")
-            return redirect("request_appointment")  # could also redirect to a list page
+            return redirect("request_appointment",pk=user.pk)  # could also redirect to a list page
     else:
         form = AppointmentRequestForm()
 
@@ -791,9 +802,12 @@ def my_requests(request):
         {"type": "Holiday", "status": "Approved", "submitted": timezone.now().date()},
     ]
     return render(request, "my_requests.html", {"my_requests": my_requests})
+
 @login_required
-def request_detail(request, pk):   # NEW (view only)
-    req = get_object_or_404(Request, pk=pk, user=request.user)   # ✅ changed 'requester' → 'user'
+def request_detail(request, pk):
+    # Fetch only the request belonging to the current user
+    req = get_object_or_404(Request, pk=pk, user=request.user)
+
     return render(request, "request_detail.html", {"req": req})
 
 
@@ -818,23 +832,14 @@ def request_edit(request, pk):     # NEW (edit if pending)
 
 
 @login_required(login_url="login")
-def approvals(request):
-    approvals = [
-        {"type": "Material", "requester": "Asha", "status": "Waiting Approval"},
-        {"type": "Appointment", "requester": "Jonas", "status": "Waiting Approval"},
-    ]
-    return render(request, "approvals.html", {"approvals": approvals})
+def approvals(request,pk):
+    user = get_object_or_404(CustomUser, pk=pk)  # always the logged-in user
+    
+    material = MaterialRequisition.objects.filter(user=user,status="paid")
+    return render(request, "approvals.html", {"approvals": approvals,"material":material})
+
 
 @login_required(login_url="login")
-def finance(request):
-    finance_items = [
-        {"type": "Material", "amount": "350,000 TZS", "status": "To Pay"},
-    ]
-    return render(request, "finance.html", {"finance_items": finance_items})
-
-@login_required(login_url="login")
-
-
 def profile(request):
     try:
         if request.method == "POST":
@@ -913,5 +918,62 @@ def update_appointment_req(request, pk):
         form = AppointmentRequestForm(instance=appointment_req)
 
     return render(request, 'update_appointment_req.html', {'form': form, 'appointment_req': appointment_req})
+
+@login_required
+def finance_dashboard(request, pk):
+    user = get_object_or_404(User, pk=pk)  # Finance admin
+    material = MaterialRequisition.objects.filter(status='Forwarded')
+    
+    return render(
+        request,
+        "finance/admin/dashboard.html",
+        {
+            "user": user,
+            "material": material
+        }
+    )
+
+@login_required
+def mark_as_paid(request, req_id):
+    req = get_object_or_404(MaterialRequisition, id=req_id)
+    if request.method == "POST":
+        req.status = "paid"
+        req.save()
+        messages.success(request, "Request marked as Paid by Finance.")
+    return redirect("finance_dashboard", pk=request.user.pk)
+
+@login_required
+def mark_as_not_paid(request, req_id):
+    req = get_object_or_404(MaterialRequisition, id=req_id)
+    if request.method == "POST":
+        req.status = "not_paid"
+        req.save()
+        messages.warning(request, "Request marked as Not Paid by Finance.")
+    return redirect("finance_dashboard", pk=request.user.pk)
+
+def manage_users(request):
+    users = User.objects.all()
+    return render(request, "admin/manage_users.html", {"users": users})
+
+def edit_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    if request.method == "POST":
+        user.username = request.POST.get("username")
+        user.email = request.POST.get("email")
+        user.first_name = request.POST.get("first_name")
+        user.last_name = request.POST.get("last_name")
+        user.save()
+        messages.success(request, "User updated successfully!")
+        return redirect("manage_users")
+
+    return render(request, "admin/edit_user.html", {"user": user})
+
+def delete_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user.delete()
+    messages.success(request, "User deleted successfully!")
+    return redirect("admin/manage_users")
+
 
 

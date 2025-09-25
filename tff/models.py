@@ -51,6 +51,9 @@ class MaterialRequisition(models.Model):
         ("Finance", "Finance"),
         ("ICT", "ICT"),
         ("Administration", "Administration"),
+        ("forwarded", "Forwarded to Finance"),
+        ("paid", "Paid by Finance"),
+        ("not_paid", "Not Paid by Finance"),
     ]
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="requisitions")
@@ -59,6 +62,7 @@ class MaterialRequisition(models.Model):
     unit = models.CharField(max_length=50, blank=True, null=True)
     department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
     purpose = models.TextField(blank=True, null=True)
+    
     status = models.CharField(
         max_length=20,
         choices=[("Pending", "Pending"), ("Approved", "Approved"), ("Rejected", "Rejected")],

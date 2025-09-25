@@ -96,31 +96,27 @@
     <!-- Manage Users -->
     <div class="dropdown-wrapper">
       <a href="">📊 Dashboard</a>
-      <div class="dropdown-btn" onclick="toggleDropdown('userDropdown')">
-        👥 Manage Users <span class="arrow">▼</span>
-      </div>
       <div class="dropdown-container" id="userDropdown">
          
         
       </div>
     </div>
-        <a href="{% url 'administration_dashboard' user.pk %}"> Administration</a>
-    <a href="{% url 'procurement_dashboard' user.pk %}"> Procurement</a>
-    <a href="{% url 'finance' %}"> Finance</a>
-    <a href="{% url 'manage_users' %}" class="btn btn-primary">Manage Users</a>
-    <a href="{% url 'hr_dashboard' user.pk %}"> HR</a>
-    <a href="{% url 'ICT_dashboard' user.pk %}"> ICT</a>
+         <a href="{% url 'manage_users' %}" class="btn btn-primary">👥Manage Users</a>
+        <a href="{% url 'administration_dashboard' user.pk %}"> Administration dashboard</a>
+    <a href="{% url 'procurement_dashboard' user.pk %}"> Procurement dashboard</a>
+    <a href="{% url 'finance_dashboard' user.pk %}"> finance dashboard</a>
+    <a href="{% url 'hr_dashboard' user.pk %}"> HR dashboard</a>
+    <a href="{% url 'ICT_dashboard' user.pk %}"> ICT dashboard</a>
     <a href="{% url 'register' %}"> Register</a>
 
   </div>
 
   <div class="main">
     <h1>Welcome, Admin 👋</h1>
-    <h2>Admin Dashboard</h2>
-
+    
     <div class="card">
       <h3>System Overview</h3>
-      <p>This dashboard allows a.</p>
+      <p>This dashboard allows to manage all admin of each department.</p>
     </div>
 
     <div class="card">

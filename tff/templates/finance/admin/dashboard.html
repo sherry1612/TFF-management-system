@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <!-- Section 1: Register HR Member -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>Register Finance Member</h5>
+    </div>
+    <div class="card-body">
+      <a href="{% url 'Hrregister' %}" class="btn btn-primary">Register New Finance Member</a>
+    </div>
+  </div>
+
+  <!-- Section 2: HR Member Requests -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>Material Requests</h5>
+    </div>
+    <div class="card-body">
+      {% if material %}
+     
+
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr>
+                              <th>Requester</th>
+
+                <th>Item name</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Department</th>
+                <th>Purpose</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in material %}
+            <tr>
+                          <td>{{ req.user.username }}</td>
+
+                <td>{{ req.item_name }}</td>
+                <td>{{ req.quantity }}</td>
+                <td>{{ req.unit }}</td>
+                <td>{{ req.department }}</td>
+                <td>{{ req.purpose }}</td>
+                <td>{{ req.status }}</td>
+                 <td>
+              <form method="post" action="{% url 'mark_as_paid' req.id %}" style="display:inline;">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-success btn-sm">Paid</button>
+</form>
+    
+<form method="post" action="{% url 'hrreject_request' req.id %}" style="display:inline;">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+</form>
+
+
+            </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No requests material request submitted yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+   
+
+      {% else %}
+      <p>No pending material requests .</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+<!-- Section 3: Holiday Requests -->
+ 
+
+</div>
+
+
+{% endblock %}
