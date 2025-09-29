@@ -22,27 +22,15 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div id="nav" class="collapse navbar-collapse">
-          <ul class="navbar-nav me-auto">
-            <li class="nav-item"><a class="nav-link" href="">Dashboard</a></li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Submit Request</a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="">Material Requisition</a></li>
-                <li><a class="dropdown-item" href="">Holiday Leave</a></li>
-                <li><a class="dropdown-item" href="">Appointment</a></li>
-              </ul>
-            </li>
-            <li class="nav-item"><a class="nav-link" href="">My Requests</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'approvals' user.pk%}">Approvals</a></li>
-            <li class="nav-item"><a class="nav-link" href="">Finance</a></li>
+          
+            
           </ul>
           <ul class="navbar-nav">
             {% if request.user.is_authenticated %}
-              <li class="nav-item"><a class="nav-link" href="">Profile</a></li>
-              <li class="nav-item"><a class="nav-link" href="">Logout</a></li>
+              <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+              <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
             {% else %}
-              <li class="nav-item"><a class="nav-link" href="">Login</a></li>
-              <li class="nav-item"><a class="nav-link" href="">Register</a></li>
+              
             {% endif %}
           </ul>
         </div>

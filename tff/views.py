@@ -289,8 +289,8 @@ def all_requests(request):
 @login_required(login_url="login")
 def ICT_dashboard(request, pk):
         user = request.user
-    
-        user = get_object_or_404(CustomUser, pk=pk) 
+        user = get_object_or_404(CustomUser, pk=pk)
+        user = request.user
         department = user.department # always the logged-in user
         material = MaterialRequisition.objects.filter(status="pending")
         holiday = HolidayLeaveRequest.objects.filter(status="pending")
@@ -408,7 +408,7 @@ def ictforward_request(request, pk):
 
             req.save()
 
-        return redirect('ICT_dashboard', pk=pk)
+        return redirect('ICT_dashboard',)
     # ===========================
 #   HOLIDAY REQUEST ACTIONS
 # ===========================
@@ -440,8 +440,9 @@ def ictforward_holiday(request, pk):
             req.next_department = next_department
             req.status = "Forwarded"
             req.save()
+        
 
-    return redirect('ICT_dashboard', pk=pk)
+    return redirect('ICT_dashboard', pk=pk )
 
 
 # ===============================
@@ -861,7 +862,8 @@ def profile(request):
         messages.error(request, f"Something went wrong: {e}")
         form = ProfileForm(instance=request.user)
 
-    return render(request, "profile.html", {"form": form})@login_required
+    return render(request, "profile.html", {"form": form}) 
+@login_required
 
 def update_material_req(request, pk):
     material_req = get_object_or_404(MaterialRequisition, pk=pk)
